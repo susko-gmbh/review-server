@@ -6,25 +6,25 @@ import { StatsValidation } from './stats.validation';
 
 const router = Router();
 
-// GET /api/stats - Get dashboard stats
+// GET /api/stats/:businessProfileId - Get dashboard stats
 router.get(
-  '/',
+  '/:businessProfileId',
   /* auth('user', 'admin'), */
   validateRequest(StatsValidation.getDashboardStatsValidationSchema),
   StatsController.getDashboardStats
 );
 
-// GET /api/stats/profile - Get profile stats
+// GET /api/stats/:businessProfileId/profile - Get profile stats
 router.get(
-  '/profile',
+  '/:businessProfileId/profile',
   /* auth('user', 'admin'), */
   validateRequest(StatsValidation.getProfileStatsValidationSchema),
   StatsController.getProfileStats
 );
 
-// GET /api/stats/filtered - Get filtered stats
+// GET /api/stats/:businessProfileId/filtered - Get filtered stats
 router.get(
-  '/filtered',
+  '/:businessProfileId/filtered',
   /* auth('user', 'admin'), */
   validateRequest(StatsValidation.getFilteredStatsValidationSchema),
   StatsController.getFilteredStats

@@ -5,10 +5,11 @@ import { REVIEW_MESSAGES } from './review.constant';
 import { ReviewService } from './review.service';
 
 const getAllReviews = catchAsync(async (req: Request, res: Response) => {
-  const { profileId, status, rating, search, page, limit } = req.query;
+  const { businessProfileId } = req.params;
+  const { status, rating, search, page, limit } = req.query;
 
   const filters = {
-    profileId: profileId as string,
+    profileId: businessProfileId,
     status: status as string,
     rating: rating as string,
     search: search as string,
@@ -73,23 +74,14 @@ const deleteReview = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getReviewsByBusinessProfileId = catchAsync(async (req: Request, res: Response) => {
-  const { businessProfileId } = req.params;
-  const result = await ReviewService.getReviewsByBusinessProfileId(businessProfileId);
 
-  res.status(StatusCodes.OK).json({
-    success: true,
-    message: REVIEW_MESSAGES.FETCH_SUCCESS,
-    statusCode: StatusCodes.OK,
-    data: result,
-  });
-});
 
 const getRecentReviews = catchAsync(async (req: Request, res: Response) => {
-  const { limit, profileId } = req.query;
+  const { businessProfileId } = req.params;
+  const { limit } = req.query;
   const result = await ReviewService.getRecentReviews(
     limit ? parseInt(limit as string, 10) : 4,
-    profileId as string
+    businessProfileId
   );
 
   res.status(StatusCodes.OK).json({
@@ -106,6 +98,5 @@ export const ReviewController = {
   createReview,
   updateReview,
   deleteReview,
-  getReviewsByBusinessProfileId,
   getRecentReviews,
 };

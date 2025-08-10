@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import AppError from '../../error/AppError';
-import { Review } from '../review/review.model';
 import { TReview, TStarRating } from '../review/review.interface';
+import { Review } from '../review/review.model';
 
 // Interface for the n8n webhook data format
 interface TWebhookReviewData {
@@ -29,7 +29,11 @@ interface TWebhookReviewData {
 class WebhookServiceClass {
   async processReviewData(webhookData: TWebhookReviewData) {
     try {
-      if (!webhookData || !webhookData.reviews || !Array.isArray(webhookData.reviews)) {
+      if (
+        !webhookData ||
+        !webhookData.reviews ||
+        !Array.isArray(webhookData.reviews)
+      ) {
         throw new AppError(
           StatusCodes.BAD_REQUEST,
           'Invalid webhook data format. Expected reviews array.'
@@ -58,8 +62,16 @@ class WebhookServiceClass {
             name: reviewData.name,
             // Set default values for fields not in webhook
             replyStatus: reviewData.reviewReply ? 'replied' : 'pending',
-            sentimentScore: this.calculateSentimentScore(reviewData.comment, reviewData.starRating),
-            responseTimeHours: reviewData.reviewReply ? this.calculateResponseTime(reviewData.createTime, reviewData.reviewReply.updateTime) : undefined,
+            sentimentScore: this.calculateSentimentScore(
+              reviewData.comment,
+              reviewData.starRating
+            ),
+            responseTimeHours: reviewData.reviewReply
+              ? this.calculateResponseTime(
+                  reviewData.createTime,
+                  reviewData.reviewReply.updateTime
+                )
+              : undefined,
           };
 
           // Add review reply if exists
@@ -71,8 +83,10 @@ class WebhookServiceClass {
           }
 
           // Check if review already exists
-          const existingReview = await Review.findOne({ reviewId: reviewData.reviewId });
-          
+          const existingReview = await Review.findOne({
+            reviewId: reviewData.reviewId,
+          });
+
           let savedReview;
           if (existingReview) {
             // Update existing review
@@ -92,7 +106,10 @@ class WebhookServiceClass {
         } catch (reviewError) {
           errors.push({
             reviewId: reviewData.reviewId,
-            error: reviewError instanceof Error ? reviewError.message : 'Unknown error',
+            error:
+              reviewError instanceof Error
+                ? reviewError.message
+                : 'Unknown error',
           });
         }
       }
@@ -101,7 +118,7 @@ class WebhookServiceClass {
         success: true,
         processedCount: processedReviews.length,
         errorCount: errors.length,
-        processedReviews: processedReviews.map(review => ({
+        processedReviews: processedReviews.map((review) => ({
           reviewId: review?.reviewId,
           starRating: review?.starRating,
           businessProfileName: review?.businessProfileName,
@@ -119,21 +136,44 @@ class WebhookServiceClass {
   private calculateSentimentScore(comment: string, starRating: string): number {
     // Simple sentiment calculation based on star rating and comment length
     // This is a basic implementation - you might want to use a proper sentiment analysis library
-    const starRatingMap = { 'ONE': 1, 'TWO': 2, 'THREE': 3, 'FOUR': 4, 'FIVE': 5 };
-    const numericRating = starRatingMap[starRating as keyof typeof starRatingMap] || 3;
+    const starRatingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
+    const numericRating =
+      starRatingMap[starRating as keyof typeof starRatingMap] || 3;
     let baseScore = (numericRating - 1) / 4; // Normalize to 0-1 range
-    
+
     // Adjust based on comment content (very basic)
-    const positiveWords = ['great', 'excellent', 'amazing', 'fantastic', 'wonderful', 'perfect', 'love', 'best'];
-    const negativeWords = ['terrible', 'awful', 'horrible', 'worst', 'hate', 'bad', 'poor', 'disappointing'];
-    
+    const positiveWords = [
+      'great',
+      'excellent',
+      'amazing',
+      'fantastic',
+      'wonderful',
+      'perfect',
+      'love',
+      'best',
+    ];
+    const negativeWords = [
+      'terrible',
+      'awful',
+      'horrible',
+      'worst',
+      'hate',
+      'bad',
+      'poor',
+      'disappointing',
+    ];
+
     const lowerComment = comment.toLowerCase();
-    const positiveCount = positiveWords.filter(word => lowerComment.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => lowerComment.includes(word)).length;
-    
+    const positiveCount = positiveWords.filter((word) =>
+      lowerComment.includes(word)
+    ).length;
+    const negativeCount = negativeWords.filter((word) =>
+      lowerComment.includes(word)
+    ).length;
+
     // Adjust score based on word sentiment
-    baseScore += (positiveCount * 0.1) - (negativeCount * 0.1);
-    
+    baseScore += positiveCount * 0.1 - negativeCount * 0.1;
+
     // Ensure score stays within 0-1 range
     return Math.max(0, Math.min(1, baseScore));
   }

@@ -6,25 +6,18 @@ import { ReviewValidation } from './review.validation';
 
 const router = Router();
 
-// Get all reviews with filters
+// Get all reviews with filters by business profile ID
 router.get(
-  '/',
+  '/:businessProfileId',
   // auth('user', 'admin'),
-  // validateRequest(ReviewValidation.getReviewsValidationSchema),
+  validateRequest(ReviewValidation.getReviewsValidationSchema),
   ReviewController.getAllReviews
 );
 
-// Get recent reviews
+// Get recent reviews by business profile ID
 router.get(
-  '/recent',
+  '/:businessProfileId/recent',
   /* auth('user', 'admin'), */ ReviewController.getRecentReviews
-);
-
-// Get reviews by business profile ID
-router.get(
-  '/profile/:businessProfileId',
-  /* auth('user', 'admin'), */
-  ReviewController.getReviewsByBusinessProfileId
 );
 
 // Get review by ID

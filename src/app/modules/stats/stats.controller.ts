@@ -5,8 +5,8 @@ import { StatsService } from './stats.service';
 import { STATS_MESSAGES } from './stats.constant';
 
 const getDashboardStats = catchAsync(async (req: Request, res: Response) => {
-  const { profileId } = req.query;
-  const result = await StatsService.getDashboardStats(profileId as string);
+  const { businessProfileId } = req.params;
+  const result = await StatsService.getDashboardStats(businessProfileId);
 
   res.status(StatusCodes.OK).json({
     success: true,
@@ -17,7 +17,8 @@ const getDashboardStats = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getProfileStats = catchAsync(async (req: Request, res: Response) => {
-  const result = await StatsService.getProfileStats();
+  const { businessProfileId } = req.params;
+  const result = await StatsService.getProfileStats(businessProfileId);
 
   res.status(StatusCodes.OK).json({
     success: true,
@@ -28,11 +29,12 @@ const getProfileStats = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getFilteredStats = catchAsync(async (req: Request, res: Response) => {
-  const { status, rating, profileId, search } = req.query;
+  const { businessProfileId } = req.params;
+  const { status, rating, search } = req.query;
   const result = await StatsService.getFilteredStats({
     status: status as string,
     rating: rating as string,
-    profileId: profileId as string,
+    profileId: businessProfileId,
     search: search as string,
   });
 

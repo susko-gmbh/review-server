@@ -8,7 +8,7 @@ const router = Router();
 
 // Protected routes
 router.get(
-  '/',
+  '/:businessProfileId',
   /* auth('user', 'admin'), */
   validateRequest(ResponseTrendsValidation.getResponseTrendsValidationSchema),
   ResponseTrendsController.getResponseTrends

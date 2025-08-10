@@ -26,7 +26,6 @@ class StatsServiceClass {
             $or: [
               { businessProfileId: profileId },
               { businessProfileName: profileId },
-              { businessProfileId: Number(profileId) },
             ],
           },
         });
@@ -163,11 +162,26 @@ class StatsServiceClass {
     }
   }
 
-  async getProfileStats(): Promise<TProfileStats[]> {
+  async getProfileStats(businessProfileId?: string): Promise<TProfileStats[]> {
     try {
-      console.log('Calculating profile stats...');
+      console.log('Calculating profile stats for businessProfileId:', businessProfileId);
 
-      const pipeline = [
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pipeline: any[] = [];
+
+      // Add profile filter if specified
+      if (businessProfileId && businessProfileId !== 'all') {
+        pipeline.push({
+          $match: {
+            $or: [
+              { businessProfileId: businessProfileId },
+              { businessProfileName: businessProfileId },
+            ],
+          },
+        });
+      }
+
+      pipeline.push(
         {
           $addFields: {
             hasReply: {
@@ -224,7 +238,7 @@ class StatsServiceClass {
             },
           },
         },
-      ];
+      );
 
       const result = await Review.aggregate(pipeline);
       console.log('Profile stats raw result:', result);
@@ -266,7 +280,6 @@ class StatsServiceClass {
         query.$or = [
           { businessProfileId: profileId },
           { businessProfileName: profileId },
-          { businessProfileId: Number(profileId) },
         ];
       }
 

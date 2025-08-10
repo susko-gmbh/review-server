@@ -3,53 +3,52 @@ import { Review } from '../app/modules/review/review.model';
 import config from '../app/config';
 
 const demoData = {
-  businessProfileId: '4190239679011069941',
+  businessProfileId: '4190239679011069952',
   businessProfileName: 'Google Review Replies - Goa Hafencity',
-  executionTimestamp: '2025-08-07T15:45:00.000Z',
+  executionTimestamp: '2025-08-05T15:02:19.162+02:00',
   reviews: [
     {
-      reviewId: 'REVIEW_1_FIVE_STAR',
+      reviewId: 'AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ',
       reviewer: {
-        profilePhotoUrl: 'https://lh3.googleusercontent.com/a/testuser1',
-        displayName: 'Satisfied Customer'
+        profilePhotoUrl: 'https://lh3.googleusercontent.com/a/ACg8ocIRZukSRYTbxqIjVUH-3fxh8JkuYVgz3xbOgRBDTnd_DxIimg=s120-c-rp-mo-ba2-br100',
+        displayName: 'Johann Albang'
       },
       starRating: 'FIVE',
-      comment: 'Absolutely fantastic experience! The food was delicious and service was impeccable.',
-      createTime: '2025-08-06T12:30:00.000Z',
-      updateTime: '2025-08-06T12:30:00.000Z',
-      reviewReply: {
-        comment: 'Thank you for your kind words! We\'re thrilled you enjoyed your experience.',
-        updateTime: '2025-08-06T14:45:00.000Z'
-      },
-      name: 'accounts/123/locations/456/reviews/REVIEW_1_FIVE_STAR'
+      comment: 'Sehr schön\nGute Bedingungen\nUnd vor allem leckeres Essen\n\n(Translated by Google)\nVery nice\nGood conditions\nAnd above all, delicious food',
+      createTime: '2025-08-04T18:32:06.555141Z',
+      updateTime: '2025-08-04T18:32:06.555141Z',
+      name: 'accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ'
     },
     {
-      reviewId: 'REVIEW_2_THREE_STAR',
+      reviewId: 'AbFvOqlYJQKpe-oJVaVyDkRnHsGV2zYCKsCVT1PCvO7DXuzkGql4Bh4wnDGNYpHRVqgnIdrt0rpG',
       reviewer: {
-        profilePhotoUrl: 'https://lh3.googleusercontent.com/a/testuser2',
-        displayName: 'Neutral Customer'
+        profilePhotoUrl: 'https://lh3.googleusercontent.com/a-/ALV-UjX2KOkEjcLuFQZpK-4u6oDLRTbB9e98xfAy96nzkfUDjP9PcUIT=s120-c-rp-mo-ba2-br100',
+        displayName: 'Florian Grewe'
       },
-      starRating: 'THREE',
-      comment: 'Food was good but service was slow. Ambience is nice though.',
-      createTime: '2025-08-05T19:15:00.000Z',
-      updateTime: '2025-08-05T19:15:00.000Z',
-      name: 'accounts/123/locations/456/reviews/REVIEW_2_THREE_STAR'
+      starRating: 'FIVE',
+      comment: 'Wer auf der Suche nach indischer Küche in stilvollem Ambiente ist, wird im Goa definitiv fündig. Das Essen ist einfach mega lecker – voller Aromen, frisch zubereitet und liebevoll angerichtet.',
+      createTime: '2025-08-03T17:16:47.243932Z',
+      updateTime: '2025-08-03T17:16:47.243932Z',
+      reviewReply: {
+        comment: 'Hallo Florian,\n\nvielen Dank für deine freundliche Rezension! Es freut uns riesig zu hören, dass dir unser indisches Essen so gut geschmeckt hat und dass du die Atmosphäre im Goa genossen hast. 😊',
+        updateTime: '2025-08-04T08:00:50.561152Z'
+      },
+      name: 'accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqlYJQKpe-oJVaVyDkRnHsGV2zYCKsCVT1PCvO7DXuzkGql4Bh4wnDGNYpHRVqgnIdrt0rpG'
     },
     {
-      reviewId: 'REVIEW_3_ONE_STAR',
+      reviewId: 'AbFvOqnjr5YBfudvn8DU8FzQUZxiAYdSC77tmJqiyCidKgN9DPQfGhmWoYriV76Rqen7oZXDLe6xyg',
       reviewer: {
-        profilePhotoUrl: 'https://lh3.googleusercontent.com/a/testuser3',
-        displayName: 'Disappointed Customer'
+        profilePhotoUrl: 'https://lh3.googleusercontent.com/a-/ALV-UjUbRQZ8kraLG-a5xWnFZxC3X4-oxHDeq3uuQ5MC3sxyj_r6Bh1yUg=s120-c-rp-mo-ba2-br100',
+        displayName: 'Lo. Fe.'
       },
-      starRating: 'ONE',
-      comment: 'Very poor experience. My order was wrong and the staff was unhelpful.',
-      createTime: '2025-08-04T20:00:00.000Z',
-      updateTime: '2025-08-04T20:00:00.000Z',
+      starRating: 'FIVE',
+      createTime: '2025-08-03T08:06:39.370029Z',
+      updateTime: '2025-08-03T08:06:39.370029Z',
       reviewReply: {
-        comment: 'We sincerely apologize for your experience. Please contact us directly so we can make this right.',
-        updateTime: '2025-08-05T09:30:00.000Z'
+        comment: 'Vielen Dank für deine Bewertung, Lo. Fe.! Wir freuen uns immer über Feedback – egal, ob positiv oder negativ.',
+        updateTime: '2025-08-04T08:00:50.562839Z'
       },
-      name: 'accounts/123/locations/456/reviews/REVIEW_3_ONE_STAR'
+      name: 'accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqnjr5YBfudvn8DU8FzQUZxiAYdSC77tmJqiyCidKgN9DPQfGhmWoYriV76Rqen7oZXDLe6xyg'
     }
   ]
 };

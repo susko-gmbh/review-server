@@ -1,20 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
-import { Collection } from 'mongodb';
 import AppError from '../../error/AppError';
+import { Review } from '../review/review.model';
 import { RESPONSE_TRENDS_MESSAGES } from './response-trends.constant';
 import { TResponseTrendData, TResponseTrendsPeriod } from './response-trends.interface';
 
 // Import the review service functionality
 // Note: This would need to be adapted to use your actual database connection
 class ResponseTrendsServiceClass {
-  private async getCollection(_name: string): Promise<Collection> {
-    // This should be implemented to get your MongoDB collection
-    // For now, throwing an error to indicate implementation needed
-    throw new AppError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Database connection not implemented. Please integrate with your MongoDB setup.'
-    );
-  }
 
   async getResponseTrends(
     period: TResponseTrendsPeriod = '30d',
@@ -39,13 +31,9 @@ class ResponseTrendsServiceClass {
           startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       }
 
-      // This is where you would implement the actual database query
-      // Similar to the nextjs/services/reviewService.ts getResponseTrends method
-      const collection = await this.getCollection('reviews');
-      
       // Build the aggregation pipeline
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pipeline: Record<string, any>[] = [];
+      const pipeline: any[] = [];
 
       // Add profile filter if specified
       if (profileId && profileId !== 'all') {
@@ -163,7 +151,7 @@ class ResponseTrendsServiceClass {
 
       pipeline.push({ $sort: { _id: 1 } });
 
-      const results = await collection.aggregate(pipeline).toArray();
+      const results = await Review.aggregate(pipeline);
 
       // Transform results to match the expected format
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

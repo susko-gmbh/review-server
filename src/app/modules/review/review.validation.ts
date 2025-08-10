@@ -12,8 +12,10 @@ const reviewReplySchema = z.object({
 });
 
 const getReviewsValidationSchema = z.object({
+  params: z.object({
+    businessProfileId: z.string().min(1, 'Business profile ID is required'),
+  }),
   query: z.object({
-    profileId: z.string().optional(),
     status: z.enum(['pending', 'replied', 'ignored']).optional(),
     rating: z.enum(['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE']).optional(),
     search: z.string().optional(),

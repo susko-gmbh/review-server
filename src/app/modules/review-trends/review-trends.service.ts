@@ -1,25 +1,16 @@
 import { StatusCodes } from 'http-status-codes';
-import { Collection } from 'mongodb';
 import AppError from '../../error/AppError';
+import { Review } from '../review/review.model';
 import { REVIEW_TRENDS_MESSAGES } from './review-trends.constant';
 import { TReviewTrendData, TReviewTrendsPeriod } from './review-trends.interface';
 
 class ReviewTrendsServiceClass {
-  private async getCollection(_name: string): Promise<Collection> {
-    // This should be implemented to get your MongoDB collection
-    // For now, throwing an error to indicate implementation needed
-    throw new AppError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Database connection not implemented. Please integrate with your MongoDB setup.'
-    );
-  }
 
   async getReviewTrends(
     period: TReviewTrendsPeriod = '30d',
     profileId?: string
   ): Promise<TReviewTrendData[]> {
     try {
-      // Calculate date range based on period
       const now = new Date();
       let startDate: Date;
 
@@ -40,11 +31,9 @@ class ReviewTrendsServiceClass {
           startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       }
 
-      const collection = await this.getCollection('reviews');
-      
       // Build the aggregation pipeline
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pipeline: Record<string, any>[] = [];
+      const pipeline: any[] = [];
 
       // Add profile filter if specified
       if (profileId && profileId !== 'all') {
@@ -60,20 +49,19 @@ class ReviewTrendsServiceClass {
       }
 
       pipeline.push(
-        { $unwind: '$reviews' },
         {
           $addFields: {
-            'reviews.createDate': {
+            createDate: {
               $dateFromString: {
-                dateString: '$reviews.createTime',
-                onError: null,
+                dateString: '$createTime',
+                onError: new Date(),
               },
             },
           },
         },
         {
           $match: {
-            'reviews.createDate': {
+            createDate: {
               $gte: startDate,
               $lte: now,
             },
@@ -81,51 +69,47 @@ class ReviewTrendsServiceClass {
         }
       );
 
-      // Add grouping logic based on period
+      // Group by period
       if (period === '7d') {
-        // Group by day for 7 days
         pipeline.push({
           $group: {
             _id: {
               $dateToString: {
                 format: '%Y-%m-%d',
-                date: '$reviews.createDate',
+                date: '$createDate',
               },
             },
             count: { $sum: 1 },
           },
         });
       } else if (period === '30d') {
-        // Group by day for 30 days
         pipeline.push({
           $group: {
             _id: {
               $dateToString: {
                 format: '%Y-%m-%d',
-                date: '$reviews.createDate',
+                date: '$createDate',
               },
             },
             count: { $sum: 1 },
           },
         });
       } else if (period === '3m') {
-        // Group by week for 3 months
         pipeline.push({
           $group: {
             _id: {
-              year: { $year: '$reviews.createDate' },
-              week: { $week: '$reviews.createDate' },
+              year: { $year: '$createDate' },
+              week: { $week: '$createDate' },
             },
             count: { $sum: 1 },
           },
         });
       } else if (period === '12m') {
-        // Group by month for 12 months
         pipeline.push({
           $group: {
             _id: {
-              year: { $year: '$reviews.createDate' },
-              month: { $month: '$reviews.createDate' },
+              year: { $year: '$createDate' },
+              month: { $month: '$createDate' },
             },
             count: { $sum: 1 },
           },
@@ -134,7 +118,7 @@ class ReviewTrendsServiceClass {
 
       pipeline.push({ $sort: { _id: 1 } });
 
-      const results = await collection.aggregate(pipeline).toArray();
+      const results = await Review.aggregate(pipeline);
 
       // Transform results to match the expected format
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
