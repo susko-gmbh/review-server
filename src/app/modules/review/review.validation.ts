@@ -39,6 +39,26 @@ const createReviewValidationSchema = z.object({
   }),
 });
 
+const createBatchReviewsValidationSchema = z.object({
+  body: z.object({
+    businessProfileId: z.union([z.string(), z.number()]).transform(String),
+    businessProfileName: z.string().min(1, 'Business profile name is required'),
+    executionTimestamp: z.string().min(1, 'Execution timestamp is required'),
+    reviews: z.array(
+      z.object({
+        reviewId: z.string().min(1, 'Review ID is required'),
+        reviewer: reviewerSchema,
+        starRating: z.enum(['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE']),
+        comment: z.string().optional(),
+        createTime: z.string().min(1, 'Create time is required'),
+        updateTime: z.string().min(1, 'Update time is required'),
+        reviewReply: reviewReplySchema.optional(),
+        name: z.string().min(1, 'Name is required'),
+      })
+    ).min(1, 'At least one review is required'),
+  }),
+});
+
 const updateReviewValidationSchema = z.object({
   params: z.object({
     id: z.string().min(1, 'Review ID is required'),
@@ -66,6 +86,7 @@ const getReviewByIdValidationSchema = z.object({
 export const ReviewValidation = {
   getReviewsValidationSchema,
   createReviewValidationSchema,
+  createBatchReviewsValidationSchema,
   updateReviewValidationSchema,
   deleteReviewValidationSchema,
   getReviewByIdValidationSchema,

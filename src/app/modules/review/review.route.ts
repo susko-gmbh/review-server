@@ -14,6 +14,14 @@ router.post(
   ReviewController.createReview
 );
 
+// Create multiple reviews in batch
+router.post(
+  '/batch',
+  /* auth('user', 'admin'), */
+  validateRequest(ReviewValidation.createBatchReviewsValidationSchema),
+  ReviewController.createBatchReviews
+);
+
 // Get all reviews with filters by business profile ID
 router.get(
   '/:businessProfileId',

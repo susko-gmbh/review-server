@@ -2,7 +2,12 @@ import { StatusCodes } from 'http-status-codes';
 import { Types } from 'mongoose';
 import AppError from '../../error/AppError';
 import { REVIEW_MESSAGES } from './review.constant';
-import { TCreateReview, TReview, TReviewQuery, TUpdateReview } from './review.interface';
+import {
+  TCreateReview,
+  TReview,
+  TReviewQuery,
+  TUpdateReview,
+} from './review.interface';
 import { Review } from './review.model';
 
 class ReviewServiceClass {
@@ -58,7 +63,7 @@ class ReviewServiceClass {
       ]);
 
       return {
-        reviews: reviews.map(review => ({
+        reviews: reviews.map((review) => ({
           ...review,
           _id: review._id?.toString(),
         })),
@@ -76,17 +81,17 @@ class ReviewServiceClass {
   async getReviewById(id: string): Promise<TReview> {
     try {
       let review;
-      
+
       // First try to find by MongoDB ObjectId
       if (Types.ObjectId.isValid(id)) {
         review = await Review.findById(id).lean();
       }
-      
+
       // If not found by ObjectId, try to find by reviewId field
       if (!review) {
         review = await Review.findOne({ reviewId: id }).lean();
       }
-      
+
       if (!review) {
         throw new AppError(StatusCodes.NOT_FOUND, REVIEW_MESSAGES.NOT_FOUND);
       }
@@ -110,7 +115,9 @@ class ReviewServiceClass {
   async createReview(reviewData: TCreateReview): Promise<TReview> {
     try {
       // Check if review with same reviewId already exists
-      const existingReview = await Review.findOne({ reviewId: reviewData.reviewId });
+      const existingReview = await Review.findOne({
+        reviewId: reviewData.reviewId,
+      });
       if (existingReview) {
         throw new AppError(
           StatusCodes.CONFLICT,
@@ -124,7 +131,7 @@ class ReviewServiceClass {
       });
 
       const savedReview = await newReview.save();
-      
+
       return {
         ...savedReview.toObject(),
         _id: savedReview._id?.toString(),
@@ -191,7 +198,7 @@ class ReviewServiceClass {
       }
 
       const deletedReview = await Review.findByIdAndDelete(id);
-      
+
       if (!deletedReview) {
         throw new AppError(StatusCodes.NOT_FOUND, REVIEW_MESSAGES.NOT_FOUND);
       }
@@ -207,7 +214,9 @@ class ReviewServiceClass {
     }
   }
 
-  async getReviewsByBusinessProfileId(businessProfileId: string): Promise<TReview[]> {
+  async getReviewsByBusinessProfileId(
+    businessProfileId: string
+  ): Promise<TReview[]> {
     try {
       const reviews = await Review.find({
         $or: [
@@ -218,7 +227,7 @@ class ReviewServiceClass {
         .sort({ createTime: -1 })
         .lean();
 
-      return reviews.map(review => ({
+      return reviews.map((review) => ({
         ...review,
         _id: review._id?.toString(),
       })) as TReview[];
@@ -231,7 +240,10 @@ class ReviewServiceClass {
     }
   }
 
-  async getRecentReviews(limit: number = 4, profileId?: string): Promise<TReview[]> {
+  async getRecentReviews(
+    limit: number = 4,
+    profileId?: string
+  ): Promise<TReview[]> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const query: Record<string, any> = {};
@@ -249,7 +261,7 @@ class ReviewServiceClass {
         .limit(limit)
         .lean();
 
-      return reviews.map(review => ({
+      return reviews.map((review) => ({
         ...review,
         _id: review._id?.toString(),
       })) as TReview[];

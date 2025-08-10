@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { catchAsync } from '../../utils/catchAsync';
 import { REVIEW_MESSAGES } from './review.constant';
 import { ReviewService } from './review.service';
+import { WebhookService } from '../webhook/webhook.service';
 
 const getAllReviews = catchAsync(async (req: Request, res: Response) => {
   const { businessProfileId } = req.params;
@@ -45,6 +46,17 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
   res.status(StatusCodes.CREATED).json({
     success: true,
     message: REVIEW_MESSAGES.CREATE_SUCCESS,
+    statusCode: StatusCodes.CREATED,
+    data: result,
+  });
+});
+
+const createBatchReviews = catchAsync(async (req: Request, res: Response) => {
+  const result = await WebhookService.processReviewData(req.body);
+
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    message: 'Batch reviews created successfully',
     statusCode: StatusCodes.CREATED,
     data: result,
   });
@@ -96,6 +108,7 @@ export const ReviewController = {
   getAllReviews,
   getReviewById,
   createReview,
+  createBatchReviews,
   updateReview,
   deleteReview,
   getRecentReviews,
