@@ -235,7 +235,7 @@ const getAllProfilesSummary = async () => {
         },
       },
       {
-        $sort: { totalReviews: -1 },
+        $sort: { totalReviews: -1 as -1 },
       },
     ];
 
