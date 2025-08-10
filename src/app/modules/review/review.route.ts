@@ -10,12 +10,15 @@ const router = Router();
 router.get(
   '/',
   // auth('user', 'admin'),
-  validateRequest(ReviewValidation.getReviewsValidationSchema),
+  // validateRequest(ReviewValidation.getReviewsValidationSchema),
   ReviewController.getAllReviews
 );
 
 // Get recent reviews
-router.get('/recent', /* auth('user', 'admin'), */ ReviewController.getRecentReviews);
+router.get(
+  '/recent',
+  /* auth('user', 'admin'), */ ReviewController.getRecentReviews
+);
 
 // Get reviews by business profile ID
 router.get(

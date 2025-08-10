@@ -75,11 +75,17 @@ class ReviewServiceClass {
 
   async getReviewById(id: string): Promise<TReview> {
     try {
-      if (!Types.ObjectId.isValid(id)) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid review ID format');
+      let review;
+      
+      // First try to find by MongoDB ObjectId
+      if (Types.ObjectId.isValid(id)) {
+        review = await Review.findById(id).lean();
       }
-
-      const review = await Review.findById(id).lean();
+      
+      // If not found by ObjectId, try to find by reviewId field
+      if (!review) {
+        review = await Review.findOne({ reviewId: id }).lean();
+      }
       
       if (!review) {
         throw new AppError(StatusCodes.NOT_FOUND, REVIEW_MESSAGES.NOT_FOUND);
