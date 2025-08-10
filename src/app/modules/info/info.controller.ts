@@ -20,6 +20,18 @@ const getBusinessInfo = catchAsync(async (req, res, _next) => {
   });
 });
 
+const getAllProfilesSummary = catchAsync(async (req, res, _next) => {
+  const result = await InfoService.getAllProfilesSummary();
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: 'All profiles summary fetched successfully',
+    statusCode: StatusCodes.OK,
+    data: result,
+  });
+});
+
 export const InfoController = {
   getBusinessInfo,
+  getAllProfilesSummary,
 };

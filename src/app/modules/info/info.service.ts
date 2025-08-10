@@ -168,6 +168,124 @@ const getBusinessInfo = async (
   }
 };
 
+const getAllProfilesSummary = async () => {
+  try {
+    console.log('Fetching all profiles summary');
+
+    // Aggregate all business profiles with their review counts
+    const pipeline = [
+      {
+        $group: {
+          _id: {
+            businessProfileId: '$businessProfileId',
+            businessProfileName: '$businessProfileName',
+          },
+          totalReviews: { $sum: 1 },
+          pendingReplies: {
+            $sum: {
+              $cond: [{ $eq: ['$replyStatus', 'pending'] }, 1, 0],
+            },
+          },
+          repliedReviews: {
+            $sum: {
+              $cond: [{ $eq: ['$replyStatus', 'replied'] }, 1, 0],
+            },
+          },
+          averageRating: {
+            $avg: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ['$starRating', 'ONE'] }, then: 1 },
+                  { case: { $eq: ['$starRating', 'TWO'] }, then: 2 },
+                  { case: { $eq: ['$starRating', 'THREE'] }, then: 3 },
+                  { case: { $eq: ['$starRating', 'FOUR'] }, then: 4 },
+                  { case: { $eq: ['$starRating', 'FIVE'] }, then: 5 },
+                ],
+                default: 0,
+              },
+            },
+          },
+          lastReviewDate: { $max: '$createTime' },
+          firstReviewDate: { $min: '$createTime' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          businessProfileId: '$_id.businessProfileId',
+          businessProfileName: '$_id.businessProfileName',
+          totalReviews: 1,
+          pendingReplies: 1,
+          repliedReviews: 1,
+          averageRating: { $round: ['$averageRating', 1] },
+          responseRate: {
+            $round: [
+              {
+                $cond: [
+                  { $gt: ['$totalReviews', 0] },
+                  { $multiply: [{ $divide: ['$repliedReviews', '$totalReviews'] }, 100] },
+                  0,
+                ],
+              },
+              1,
+            ],
+          },
+          lastReviewDate: 1,
+          firstReviewDate: 1,
+        },
+      },
+      {
+        $sort: { totalReviews: -1 },
+      },
+    ];
+
+    const profiles = await Review.aggregate(pipeline);
+
+    // Calculate overall statistics
+    const totalProfiles = profiles.length;
+    const totalReviewsAcrossAllProfiles = profiles.reduce(
+      (sum, profile) => sum + profile.totalReviews,
+      0
+    );
+    const totalPendingReplies = profiles.reduce(
+      (sum, profile) => sum + profile.pendingReplies,
+      0
+    );
+    const overallAverageRating = profiles.length > 0
+      ? Math.round(
+          (profiles.reduce((sum, profile) => sum + profile.averageRating, 0) /
+            profiles.length) *
+            10
+        ) / 10
+      : 0;
+
+    const summary = {
+      totalProfiles,
+      totalReviews: totalReviewsAcrossAllProfiles,
+      totalPendingReplies,
+      overallAverageRating,
+      profiles,
+    };
+
+    console.log('All profiles summary calculated successfully:', {
+      totalProfiles,
+      totalReviews: totalReviewsAcrossAllProfiles,
+    });
+    
+    return summary;
+  } catch (error) {
+    console.error('Error in getAllProfilesSummary:', error);
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      INFO_MESSAGES.FETCH_ERROR
+    );
+  }
+};
+
 export const InfoService = {
   getBusinessInfo,
+  getAllProfilesSummary,
 };
