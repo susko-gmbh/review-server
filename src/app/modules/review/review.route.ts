@@ -6,6 +6,14 @@ import { ReviewValidation } from './review.validation';
 
 const router = Router();
 
+// Create new review (PUT BEFORE PARAMETERIZED ROUTES)
+router.post(
+  '/',
+  /* auth('user', 'admin'), */
+  validateRequest(ReviewValidation.createReviewValidationSchema),
+  ReviewController.createReview
+);
+
 // Get all reviews with filters by business profile ID
 router.get(
   '/:businessProfileId',
@@ -26,14 +34,6 @@ router.get(
   /* auth('user', 'admin'), */
   validateRequest(ReviewValidation.getReviewByIdValidationSchema),
   ReviewController.getReviewById
-);
-
-// Create new review
-router.post(
-  '/',
-  /* auth('user', 'admin'), */
-  validateRequest(ReviewValidation.createReviewValidationSchema),
-  ReviewController.createReview
 );
 
 // Update review
