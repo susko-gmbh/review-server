@@ -37,6 +37,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
     "swagger-autogen": "^2.23.7",
+    "vercel": "^44.7.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
