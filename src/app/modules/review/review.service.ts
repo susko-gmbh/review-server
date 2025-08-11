@@ -448,6 +448,85 @@ class ReviewServiceClass {
       );
     }
   }
+
+  async getLastReplyDate(filters: {
+    businessProfileId?: string;
+  }) {
+    try {
+      const { businessProfileId } = filters;
+
+      // Build match query
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const matchQuery: Record<string, any> = {
+        reviewReply: { $exists: true, $ne: null },
+      };
+
+      // Add business profile filter if provided
+      if (businessProfileId) {
+        matchQuery.$or = [
+          { businessProfileId: businessProfileId },
+          { businessProfileName: businessProfileId },
+          { businessProfileId: Number(businessProfileId) },
+        ];
+      }
+
+      // Aggregation pipeline to find the last reply date and count replies for that date
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pipeline: any[] = [
+        { $match: matchQuery },
+        {
+          $addFields: {
+            replyDate: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: {
+                  $dateFromString: {
+                    dateString: '$reviewReply.updateTime'
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$replyDate',
+            count: { $sum: 1 },
+            lastReplyTime: { $max: '$reviewReply.updateTime' }
+          }
+        },
+        {
+          $sort: { _id: -1 }
+        },
+        {
+          $limit: 1
+        }
+      ];
+
+      const result = await Review.aggregate(pipeline);
+
+      if (result.length === 0) {
+        return {
+          lastReplyDate: null,
+          totalRepliesOnLastDate: 0,
+          lastReplyTime: null
+        };
+      }
+
+      const lastReplyData = result[0];
+      
+      return {
+        lastReplyDate: lastReplyData._id,
+        totalRepliesOnLastDate: lastReplyData.count,
+        lastReplyTime: lastReplyData.lastReplyTime
+      };
+    } catch {
+      throw new AppError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to fetch last reply date data'
+      );
+    }
+  }
 }
 
 export const ReviewService = new ReviewServiceClass();

@@ -97,6 +97,12 @@ const getReplySummaryValidationSchema = z.object({
   }),
 });
 
+const getLastReplyDateValidationSchema = z.object({
+  query: z.object({
+    businessProfileId: z.string().optional(),
+  }),
+});
+
 export const ReviewValidation = {
   getReviewsValidationSchema,
   createReviewValidationSchema,
@@ -105,4 +111,5 @@ export const ReviewValidation = {
   deleteReviewValidationSchema,
   getReviewByIdValidationSchema,
   getReplySummaryValidationSchema,
+  getLastReplyDateValidationSchema,
 };

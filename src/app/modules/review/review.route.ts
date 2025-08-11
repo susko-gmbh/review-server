@@ -30,6 +30,14 @@ router.get(
   ReviewController.getReplySummary
 );
 
+// Get last reply date and total replies for that day
+router.get(
+  '/replies/last-date',
+  /* auth('user', 'admin'), */
+  validateRequest(ReviewValidation.getLastReplyDateValidationSchema),
+  ReviewController.getLastReplyDate
+);
+
 // Get all reviews with filters by business profile ID
 router.get(
   '/:businessProfileId',

@@ -129,6 +129,23 @@ const getRecentReviews = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getLastReplyDate = catchAsync(async (req: Request, res: Response) => {
+  const { businessProfileId } = req.query;
+
+  const filters = {
+    businessProfileId: businessProfileId as string,
+  };
+
+  const result = await ReviewService.getLastReplyDate(filters);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: REVIEW_MESSAGES.FETCH_SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: result,
+  });
+});
+
 export const ReviewController = {
   getAllReviews,
   getReviewById,
@@ -138,4 +155,5 @@ export const ReviewController = {
   deleteReview,
   getRecentReviews,
   getReplySummary,
+  getLastReplyDate,
 };
