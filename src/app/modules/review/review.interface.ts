@@ -37,6 +37,9 @@ export interface TReviewQuery {
   status?: string;
   rating?: string;
   search?: string;
+  aiGenerated?: boolean;
+  replyStartDate?: string;
+  replyEndDate?: string;
   page?: number;
   limit?: number;
 }

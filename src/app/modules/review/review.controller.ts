@@ -7,13 +7,16 @@ import { WebhookService } from '../webhook/webhook.service';
 
 const getAllReviews = catchAsync(async (req: Request, res: Response) => {
   const { businessProfileId } = req.params;
-  const { status, rating, search, page, limit } = req.query;
+  const { status, rating, search, aiGenerated, replyStartDate, replyEndDate, page, limit } = req.query;
 
   const filters = {
     profileId: businessProfileId,
     status: status as string,
     rating: rating as string,
     search: search as string,
+    aiGenerated: aiGenerated === 'true' ? true : aiGenerated === 'false' ? false : undefined,
+    replyStartDate: replyStartDate as string,
+    replyEndDate: replyEndDate as string,
     page: page ? parseInt(page as string, 10) : 1,
     limit: limit ? parseInt(limit as string, 10) : 10,
   };

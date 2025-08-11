@@ -18,6 +18,9 @@ class ReviewServiceClass {
         status,
         rating,
         search = '',
+        aiGenerated,
+        replyStartDate,
+        replyEndDate,
         page = 1,
         limit = 10,
       } = filters;
@@ -50,6 +53,27 @@ class ReviewServiceClass {
       // Add search filter
       if (search) {
         query.$text = { $search: search };
+      }
+
+      // Add AI generated filter
+      if (aiGenerated !== undefined) {
+        query.reviewReply = { $exists: true, $ne: null };
+        query['reviewReply.aiGenerated'] = aiGenerated;
+      }
+
+      // Add reply date range filter
+      if (replyStartDate || replyEndDate) {
+        query.reviewReply = { ...query.reviewReply, $exists: true, $ne: null };
+        const dateFilter: Record<string, Date> = {};
+        if (replyStartDate) {
+          dateFilter.$gte = new Date(replyStartDate);
+        }
+        if (replyEndDate) {
+          const endDateTime = new Date(replyEndDate);
+          endDateTime.setHours(23, 59, 59, 999); // End of day
+          dateFilter.$lte = endDateTime;
+        }
+        query['reviewReply.updateTime'] = dateFilter;
       }
 
       // Execute query with pagination
