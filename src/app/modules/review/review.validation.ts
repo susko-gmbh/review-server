@@ -103,6 +103,17 @@ const getLastReplyDateValidationSchema = z.object({
   }),
 });
 
+const getReviewRepliesValidationSchema = z.object({
+  query: z.object({
+    businessProfileId: z.string().optional(),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    aiGenerated: z.string().transform((val) => val === 'true').optional(),
+    page: z.string().transform(Number).pipe(z.number().min(1)).optional(),
+    limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional(),
+  }),
+});
+
 export const ReviewValidation = {
   getReviewsValidationSchema,
   createReviewValidationSchema,
@@ -112,4 +123,5 @@ export const ReviewValidation = {
   getReviewByIdValidationSchema,
   getReplySummaryValidationSchema,
   getLastReplyDateValidationSchema,
+  getReviewRepliesValidationSchema,
 };

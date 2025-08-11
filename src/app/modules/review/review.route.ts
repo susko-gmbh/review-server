@@ -38,6 +38,14 @@ router.get(
   ReviewController.getLastReplyDate
 );
 
+// Get review replies with message format
+router.get(
+  '/replies',
+  /* auth('user', 'admin'), */
+  validateRequest(ReviewValidation.getReviewRepliesValidationSchema),
+  ReviewController.getReviewReplies
+);
+
 // Get all reviews with filters by business profile ID
 router.get(
   '/:businessProfileId',

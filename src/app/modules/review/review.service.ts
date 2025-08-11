@@ -7,6 +7,8 @@ import {
   TReview,
   TReviewQuery,
   TUpdateReview,
+  TReviewRepliesQuery,
+  TReviewReplyWithMessage,
 } from './review.interface';
 import { Review } from './review.model';
 
@@ -524,6 +526,98 @@ class ReviewServiceClass {
       throw new AppError(
         StatusCodes.INTERNAL_SERVER_ERROR,
         'Failed to fetch last reply date data'
+      );
+    }
+  }
+
+  async getReviewReplies(filters: TReviewRepliesQuery) {
+    try {
+      const {
+        businessProfileId,
+        startDate,
+        endDate,
+        aiGenerated,
+        page = 1,
+        limit = 10,
+      } = filters;
+
+      const skip = (page - 1) * limit;
+
+      // Build match query
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const matchQuery: Record<string, any> = {
+        reviewReply: { $exists: true, $ne: null },
+      };
+
+      // Add business profile filter if provided
+      if (businessProfileId) {
+        matchQuery.$or = [
+          { businessProfileId: businessProfileId },
+          { businessProfileName: businessProfileId },
+          { businessProfileId: Number(businessProfileId) },
+        ];
+      }
+
+      // Add date filters if provided
+      if (startDate || endDate) {
+        const dateFilter: Record<string, string> = {};
+        if (startDate) {
+          dateFilter.$gte = startDate;
+        }
+        if (endDate) {
+          dateFilter.$lte = endDate;
+        }
+        matchQuery['reviewReply.updateTime'] = dateFilter;
+      }
+
+      // Add AI generated filter if provided
+      if (aiGenerated !== undefined) {
+        matchQuery['reviewReply.aiGenerated'] = aiGenerated;
+      }
+
+      // Get reviews with replies
+      const reviews = await Review.find(matchQuery)
+        .sort({ 'reviewReply.updateTime': -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+      // Transform data to match the required format
+      const reviewReplies: TReviewReplyWithMessage[] = reviews.map((review, index) => ({
+        reviewId: review.reviewId,
+        reviewer: review.reviewer,
+        starRating: review.starRating,
+        comment: review.comment,
+        createTime: review.createTime,
+        updateTime: review.updateTime,
+        name: review.name,
+        message: {
+          content: review.reviewReply?.comment || '',
+          role: 'assistant',
+          refusal: null,
+          annotations: [],
+        },
+        index: index,
+        logprobs: null,
+        finish_reason: 'stop',
+      }));
+
+      // Get total count for pagination
+      const totalCount = await Review.countDocuments(matchQuery);
+
+      return {
+        reviewReplies,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalItems: totalCount,
+          itemsPerPage: limit,
+        },
+      };
+    } catch {
+      throw new AppError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to fetch review replies'
       );
     }
   }
