@@ -64,14 +64,12 @@ class ReviewServiceClass {
       // Add reply date range filter
       if (replyStartDate || replyEndDate) {
         query.reviewReply = { ...query.reviewReply, $exists: true, $ne: null };
-        const dateFilter: Record<string, Date> = {};
+        const dateFilter: Record<string, string> = {};
         if (replyStartDate) {
-          dateFilter.$gte = new Date(replyStartDate);
+          dateFilter.$gte = replyStartDate;
         }
         if (replyEndDate) {
-          const endDateTime = new Date(replyEndDate);
-          endDateTime.setHours(23, 59, 59, 999); // End of day
-          dateFilter.$lte = endDateTime;
+          dateFilter.$lte = replyEndDate;
         }
         query['reviewReply.updateTime'] = dateFilter;
       }
