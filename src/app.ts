@@ -9,8 +9,9 @@ import router from './routes';
 
 const app: Application = express();
 
-// Parsers
-app.use(express.json());
+// Parsers with increased size limits for large payloads
+app.use(express.json({ limit: '200mb' }));
+app.use(express.urlencoded({ limit: '200mb', extended: true }));
 
 // Enhanced CORS configuration for subdomains
 // const corsConfig = {
