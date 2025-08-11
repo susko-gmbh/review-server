@@ -307,9 +307,10 @@ class ReviewServiceClass {
       const { businessProfileId, startDate, endDate, aiGenerated, page = 1, limit = 10 } = filters;
       const skip = (page - 1) * limit;
 
-      // Build match query for aggregation
-      const matchQuery: Record<string, unknown> = {
-        reviewReply: { $exists: true, $ne: null },
+      // Build match query for aggregation - only get reviews that actually have reply content
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const matchQuery: Record<string, any> = {
+        'reviewReply.comment': { $exists: true, $ne: null, $regex: /.+/ },
       };
 
       // Add business profile filter
@@ -457,10 +458,10 @@ class ReviewServiceClass {
     try {
       const { businessProfileId } = filters;
 
-      // Build match query
+      // Build match query - only get reviews that actually have reply content
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const matchQuery: Record<string, any> = {
-        reviewReply: { $exists: true, $ne: null },
+        'reviewReply.comment': { $exists: true, $ne: null, $regex: /.+/ },
       };
 
       // Add business profile filter if provided
@@ -546,7 +547,7 @@ class ReviewServiceClass {
       // Build match query
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const matchQuery: Record<string, any> = {
-        reviewReply: { $exists: true, $ne: null },
+        'reviewReply.comment': { $exists: true, $ne: null, $regex: /.+/ },
       };
 
       // Add business profile filter if provided
