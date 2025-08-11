@@ -40,6 +40,28 @@ const getReviewById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getReplySummary = catchAsync(async (req: Request, res: Response) => {
+  const { businessProfileId, startDate, endDate, aiGenerated, page, limit } = req.query;
+
+  const filters = {
+    businessProfileId: businessProfileId as string,
+    startDate: startDate as string,
+    endDate: endDate as string,
+    aiGenerated: aiGenerated !== undefined ? aiGenerated === 'true' : undefined,
+    page: page ? parseInt(page as string, 10) : 1,
+    limit: limit ? parseInt(limit as string, 10) : 10,
+  };
+
+  const result = await ReviewService.getReplySummary(filters);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: REVIEW_MESSAGES.FETCH_SUCCESS,
+    statusCode: StatusCodes.OK,
+    data: result,
+  });
+});
+
 const createReview = catchAsync(async (req: Request, res: Response) => {
   const result = await ReviewService.createReview(req.body);
 
@@ -112,4 +134,5 @@ export const ReviewController = {
   updateReview,
   deleteReview,
   getRecentReviews,
+  getReplySummary,
 };

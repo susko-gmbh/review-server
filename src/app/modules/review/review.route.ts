@@ -22,6 +22,14 @@ router.post(
   ReviewController.createBatchReviews
 );
 
+// Get reply summary with filtering options
+router.get(
+  '/replies/summary',
+  /* auth('user', 'admin'), */
+  validateRequest(ReviewValidation.getReplySummaryValidationSchema),
+  ReviewController.getReplySummary
+);
+
 // Get all reviews with filters by business profile ID
 router.get(
   '/:businessProfileId',

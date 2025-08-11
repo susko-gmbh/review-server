@@ -270,6 +270,164 @@ class ReviewServiceClass {
       return [];
     }
   }
+
+  async getReplySummary(filters: {
+    businessProfileId?: string;
+    startDate?: string;
+    endDate?: string;
+    aiGenerated?: boolean;
+    page?: number;
+    limit?: number;
+  }) {
+    try {
+      const { businessProfileId, startDate, endDate, aiGenerated, page = 1, limit = 10 } = filters;
+      const skip = (page - 1) * limit;
+
+      // Build match query for aggregation
+      const matchQuery: Record<string, unknown> = {
+        reviewReply: { $exists: true, $ne: null },
+      };
+
+      // Add business profile filter
+      if (businessProfileId) {
+        matchQuery.$or = [
+          { businessProfileId: businessProfileId },
+          { businessProfileName: businessProfileId },
+          { businessProfileId: Number(businessProfileId) },
+        ];
+      }
+
+      // Add date range filter for reviewReply.updateTime
+      if (startDate || endDate) {
+        const dateFilter: Record<string, Date> = {};
+        if (startDate) {
+          dateFilter.$gte = new Date(startDate);
+        }
+        if (endDate) {
+          const endDateTime = new Date(endDate);
+          endDateTime.setHours(23, 59, 59, 999); // End of day
+          dateFilter.$lte = endDateTime;
+        }
+        matchQuery['reviewReply.updateTime'] = dateFilter;
+      }
+
+      // Add AI generated filter
+      if (aiGenerated !== undefined) {
+        matchQuery['reviewReply.aiGenerated'] = aiGenerated;
+      }
+
+      // Get summary statistics
+      const summaryPipeline = [
+        { $match: matchQuery },
+        {
+          $group: {
+            _id: null,
+            totalReplies: { $sum: 1 },
+            aiGeneratedReplies: {
+              $sum: {
+                $cond: [{ $eq: ['$reviewReply.aiGenerated', true] }, 1, 0],
+              },
+            },
+            manualReplies: {
+              $sum: {
+                $cond: [{ $ne: ['$reviewReply.aiGenerated', true] }, 1, 0],
+              },
+            },
+          },
+        },
+      ];
+
+      // Get paginated replies with details
+      const repliesPipeline = [
+        { $match: matchQuery },
+        {
+          $project: {
+            reviewId: 1,
+            businessProfileId: 1,
+            businessProfileName: 1,
+            reviewer: 1,
+            starRating: 1,
+            comment: 1,
+            reviewReply: 1,
+            createTime: 1,
+            updateTime: 1,
+            replyDate: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: { $dateFromString: { dateString: '$reviewReply.updateTime' } },
+              },
+            },
+          },
+        },
+        { $sort: { 'reviewReply.updateTime': -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ];
+
+      // Get daily summary for the filtered period
+      const dailySummaryPipeline = [
+        { $match: matchQuery },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: { $dateFromString: { dateString: '$reviewReply.updateTime' } },
+              },
+            },
+            totalReplies: { $sum: 1 },
+            aiGeneratedReplies: {
+              $sum: {
+                $cond: [{ $eq: ['$reviewReply.aiGenerated', true] }, 1, 0],
+              },
+            },
+            manualReplies: {
+              $sum: {
+                $cond: [{ $ne: ['$reviewReply.aiGenerated', true] }, 1, 0],
+              },
+            },
+          },
+        },
+        { $sort: { _id: -1 } },
+      ];
+
+      const [summaryResult, repliesResult, dailySummaryResult] = await Promise.all([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Review.aggregate(summaryPipeline as any),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Review.aggregate(repliesPipeline as any),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Review.aggregate(dailySummaryPipeline as any),
+      ]);
+
+      const summary = summaryResult[0] || {
+        totalReplies: 0,
+        aiGeneratedReplies: 0,
+        manualReplies: 0,
+      };
+
+      // Get total count for pagination
+      const totalCount = await Review.countDocuments(matchQuery);
+      const totalPages = Math.ceil(totalCount / limit);
+
+      return {
+        summary,
+        dailySummary: dailySummaryResult,
+        replies: repliesResult,
+        pagination: {
+          page,
+          limit,
+          total: totalCount,
+          totalPages,
+        },
+      };
+    } catch {
+      throw new AppError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to fetch reply summary'
+      );
+    }
+  }
 }
 
 export const ReviewService = new ReviewServiceClass();
