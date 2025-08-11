@@ -321,14 +321,12 @@ class ReviewServiceClass {
 
       // Add date range filter for reviewReply.updateTime
       if (startDate || endDate) {
-        const dateFilter: Record<string, Date> = {};
+        const dateFilter: Record<string, string> = {};
         if (startDate) {
-          dateFilter.$gte = new Date(startDate);
+          dateFilter.$gte = startDate;
         }
         if (endDate) {
-          const endDateTime = new Date(endDate);
-          endDateTime.setHours(23, 59, 59, 999); // End of day
-          dateFilter.$lte = endDateTime;
+          dateFilter.$lte = endDate;
         }
         matchQuery['reviewReply.updateTime'] = dateFilter;
       }
