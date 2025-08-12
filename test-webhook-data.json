@@ -1,0 +1,44 @@
+[
+  {
+    "businessProfileId": 4190239679011070000,
+    "businessProfileName": "Google Review Replies - Goa Hafencity",
+    "executionTimestamp": "2025-08-05T15:02:19.162+02:00",
+    "reviews": [
+      {
+        "reviewId": "AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ",
+        "reviewer": {
+          "profilePhotoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIRZukSRYTbxqIjVUH-3fxh8JkuYVgz3xbOgRBDTnd_DxIimg=s120-c-rp-mo-ba2-br100",
+          "displayName": "Johann Albang"
+        },
+        "starRating": "FIVE",
+        "comment": "Sehr schön\nGute Bedingungen\nUnd vor allem leckeres Essen\n\n(Translated by Google)\nVery nice\nGood conditions\nAnd above all, delicious food",
+        "createTime": "2025-08-04T18:32:06.555141Z",
+        "updateTime": "2025-08-04T18:32:06.555141Z",
+        "name": "accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ"
+      }
+    ],
+    "reviewReplies": [
+      {
+        "reviewId": "AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ",
+        "reviewer": {
+          "profilePhotoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIRZukSRYTbxqIjVUH-3fxh8JkuYVgz3xbOgRBDTnd_DxIimg=s120-c-rp-mo-ba2-br100",
+          "displayName": "Johann Albang"
+        },
+        "starRating": "FIVE",
+        "comment": "Sehr schön\nGute Bedingungen\nUnd vor allem leckeres Essen\n\n(Translated by Google)\nVery nice\nGood conditions\nAnd above all, delicious food",
+        "createTime": "2025-08-04T18:32:06.555141Z",
+        "updateTime": "2025-08-04T18:32:06.555141Z",
+        "name": "accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ",
+        "message": {
+          "content": "Hallo Johann,\n\nvielen Dank für deine tolle Rezension! Es freut uns riesig zu hören, dass du bei uns die schönen Bedingungen und unser leckeres Essen genießen konntest. Das ganze Team gibt sein Bestes, um jedem Besuch bei uns zu einem besonderen Erlebnis zu machen. \n\nWir hoffen, dich bald wieder im Goa begrüßen zu dürfen!\n\nLiebe Grüße,  \nDein Goa Team",
+          "role": "assistant",
+          "refusal": null,
+          "annotations": []
+        },
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ]
+  }
+]

@@ -460,7 +460,7 @@ class ReviewServiceClass {
       // Build match query
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const matchQuery: Record<string, any> = {
-        'reviewReply.comment': { $exists: true, $ne: null, $regex: /.+/ },
+        reviewReply: { $exists: true, $ne: null },
       };
 
       // Add business profile filter if provided
@@ -546,7 +546,7 @@ class ReviewServiceClass {
       // Build match query
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const matchQuery: Record<string, any> = {
-        'reviewReply.comment': { $exists: true, $ne: null, $regex: /.+/ },
+        reviewReply: { $exists: true, $ne: null },
       };
 
       // Add business profile filter if provided

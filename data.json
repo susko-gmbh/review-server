@@ -1,0 +1,60 @@
+[
+  {
+    "businessProfileId": 4.19023967901107e18,
+    "businessProfileName": "Google Review Replies - Goa Hafencity",
+    "executionTimestamp": "2025-08-05T15:02:19.162+02:00",
+    "reviews": [
+      {
+        "reviewId": "AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ",
+        "reviewer": {
+          "profilePhotoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIRZukSRYTbxqIjVUH-3fxh8JkuYVgz3xbOgRBDTnd_DxIimg=s120-c-rp-mo-ba2-br100",
+          "displayName": "Johann Albang"
+        },
+        "starRating": "FIVE",
+        "comment": "Sehr schön\nGute Bedingungen\nUnd vor allem leckeres Essen\n\n(Translated by Google)\nVery nice\nGood conditions\nAnd above all, delicious food",
+        "createTime": "2025-08-04T18:32:06.555141Z",
+        "updateTime": "2025-08-04T18:32:06.555141Z",
+        "name": "accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ"
+      },
+      {
+        "reviewId": "AbFvOqlYJQKpe-oJVaVyDkRnHsGV2zYCKsCVT1PCvO7DXuzkGql4Bh4wnDGNYpHRVqgnIdrt0rpG",
+        "reviewer": {
+          "profilePhotoUrl": "https://lh3.googleusercontent.com/a-/ALV-UjX2KOkEjcLuFQZpK-4u6oDLRTbB9e98xfAy96nzkfUDjP9PcUIT=s120-c-rp-mo-ba2-br100",
+          "displayName": "Florian Grewe"
+        },
+        "starRating": "FIVE",
+        "comment": "The attentive and extremely friendly service is particularly noteworthy. The team is warm and courteous, and provides expert advice on the selection of dishes and the desired level of spiciness.\n\nThe ambiance is modern and tasteful. The dining room isn't particularly large, which can lead to a bit more noise when the place is full.\n\nA little tip for those who like spicy food: With five selectable spice levels, I opted for level 2 (\"normal\") as a precaution – in retrospect, I would have liked it to be a bit more. So if you like spicy food, feel free to order at least \"spicy.\"\n\nAll in all, a thoroughly enjoyable evening. We'll definitely be back – with a big appetite and perhaps a little more spice.",
+        "createTime": "2025-08-03T17:16:47.243932Z",
+        "updateTime": "2025-08-03T17:16:47.243932Z",
+        "reviewReply": {
+          "comment": "Hallo Florian,\n\nvielen Dank für deine freundliche Rezension! Es freut uns riesig zu hören, dass dir unser indisches Essen so gut geschmeckt hat und dass du die Atmosphäre im Goa genossen hast. 😊\n\nUnser Team gibt sich wirklich Mühe, die Gerichte lecker und ansprechend zu gestalten, und dein Lob über den Service macht uns besonders stolz. Wir sind stets bemüht, unseren Gästen mit Rat zur Seite zu stehen, und es ist toll zu wissen, dass du das erlebt hast!\n\nDanke auch für den hilfreichen Tipp bezüglich der Schärfegrade – es ist immer spannend zu hören, wie unsere Gäste ihre Geschmackserlebnisse wahrnehmen. Nächstes Mal freuen wir uns auf deinen Appetit und die Herausforderung mit dem schärferen Gericht! 🔥\n\nWir freuen uns schon darauf, dich bald wieder bei uns begrüßen zu dürfen!\n\nHerzliche Grüße,  \ndein Goa Team",
+          "updateTime": "2025-08-04T08:00:50.561152Z"
+        },
+        "name": "accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqlYJQKpe-oJVaVyDkRnHsGV2zYCKsCVT1PCvO7DXuzkGql4Bh4wnDGNYpHRVqgnIdrt0rpG"
+      }
+    ],
+    "reviewReplies": [
+      {
+        "reviewId": "AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ",
+        "reviewer": {
+          "profilePhotoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIRZukSRYTbxqIjVUH-3fxh8JkuYVgz3xbOgRBDTnd_DxIimg=s120-c-rp-mo-ba2-br100",
+          "displayName": "Johann Albang"
+        },
+        "starRating": "FIVE",
+        "comment": "Sehr schön\nGute Bedingungen\nUnd vor allem leckeres Essen\n\n(Translated by Google)\nVery nice\nGood conditions\nAnd above all, delicious food",
+        "createTime": "2025-08-04T18:32:06.555141Z",
+        "updateTime": "2025-08-04T18:32:06.555141Z",
+        "name": "accounts/111536592247373497212/locations/4190239679011069941/reviews/AbFvOqmJLz2GWnFJEuyFJBrRlb_dZ2JIcPZXUkXHgeuloCZov9fnaJjfBx-J9agkDGMW8_mowPEmJQ",
+        "message": {
+          "content": "Hallo Johann,\n\nvielen Dank für deine tolle Rezension! Es freut uns riesig zu hören, dass du bei uns die schönen Bedingungen und unser leckeres Essen genießen konntest. Das ganze Team gibt sein Bestes, um jedem Besuch bei uns zu einem besonderen Erlebnis zu machen. \n\nWir hoffen, dich bald wieder im Goa begrüßen zu dürfen!\n\nLiebe Grüße,  \nDein Goa Team",
+          "role": "assistant",
+          "refusal": null,
+          "annotations": []
+        },
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ]
+  }
+]

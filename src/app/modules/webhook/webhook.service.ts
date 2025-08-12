@@ -2,6 +2,8 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../error/AppError';
 import { TReview, TStarRating } from '../review/review.interface';
 import { Review } from '../review/review.model';
+import { TReviewerReply } from '../reviewer-reply/reviewer-reply.interface';
+import { ReviewerReply } from '../reviewer-reply/reviewer-reply.model';
 
 // Interface for the n8n webhook data format
 interface TWebhookReviewData {
@@ -24,33 +26,63 @@ interface TWebhookReviewData {
     };
     name: string;
   }[];
+  reviewReplies?: {
+    reviewId: string;
+    reviewer: {
+      profilePhotoUrl: string;
+      displayName: string;
+    };
+    starRating: 'ONE' | 'TWO' | 'THREE' | 'FOUR' | 'FIVE';
+    comment: string;
+    createTime: string;
+    updateTime: string;
+    name: string;
+    message: {
+      content: string;
+      role: string;
+      refusal: string | null;
+      annotations: unknown[];
+    };
+    index: number;
+    logprobs: unknown;
+    finish_reason: string;
+  }[];
 }
 
 class WebhookServiceClass {
-  async processReviewData(webhookData: TWebhookReviewData) {
+  async processReviewData(webhookData: TWebhookReviewData | TWebhookReviewData[]) {
     try {
-      if (
-        !webhookData ||
-        !webhookData.reviews ||
-        !Array.isArray(webhookData.reviews)
-      ) {
-        throw new AppError(
-          StatusCodes.BAD_REQUEST,
-          'Invalid webhook data format. Expected reviews array.'
-        );
-      }
+      // Handle both single object and array of objects
+      const dataArray = Array.isArray(webhookData) ? webhookData : [webhookData];
+      
+      const allProcessedReviews = [];
+      const allProcessedReviewerReplies = [];
+      const allErrors = [];
+      
+      for (const singleWebhookData of dataArray) {
+        if (
+          !singleWebhookData ||
+          !singleWebhookData.reviews ||
+          !Array.isArray(singleWebhookData.reviews)
+        ) {
+          throw new AppError(
+            StatusCodes.BAD_REQUEST,
+            'Invalid webhook data format. Expected reviews array.'
+          );
+        }
 
-      const processedReviews = [];
-      const errors = [];
+        const processedReviews = [];
+        const processedReviewerReplies = [];
+        const errors = [];
 
-      for (const reviewData of webhookData.reviews) {
+        for (const reviewData of singleWebhookData.reviews) {
         try {
           // Transform the webhook data to match our review schema
           const transformedReview: Partial<TReview> = {
             reviewId: reviewData.reviewId,
-            businessProfileId: webhookData.businessProfileId.toString(),
-            businessProfileName: webhookData.businessProfileName,
-            executionTimestamp: webhookData.executionTimestamp,
+            businessProfileId: singleWebhookData.businessProfileId.toString(),
+            businessProfileName: singleWebhookData.businessProfileName,
+            executionTimestamp: singleWebhookData.executionTimestamp,
             reviewer: {
               profilePhotoUrl: reviewData.reviewer.profilePhotoUrl,
               displayName: reviewData.reviewer.displayName,
@@ -114,16 +146,89 @@ class WebhookServiceClass {
         }
       }
 
+        // Process reviewReplies if they exist
+        if (singleWebhookData.reviewReplies && Array.isArray(singleWebhookData.reviewReplies)) {
+          for (const reviewerReplyData of singleWebhookData.reviewReplies) {
+          try {
+            // Transform the webhook data to match our reviewer reply schema
+            const transformedReviewerReply: TReviewerReply = {
+              reviewId: reviewerReplyData.reviewId,
+              businessProfileId: singleWebhookData.businessProfileId.toString(),
+              reviewer: {
+                profilePhotoUrl: reviewerReplyData.reviewer.profilePhotoUrl,
+                displayName: reviewerReplyData.reviewer.displayName,
+              },
+              starRating: reviewerReplyData.starRating,
+              comment: reviewerReplyData.comment,
+              createTime: reviewerReplyData.createTime,
+              updateTime: reviewerReplyData.updateTime,
+              name: reviewerReplyData.name,
+              message: {
+                content: reviewerReplyData.message.content,
+                role: reviewerReplyData.message.role,
+                refusal: reviewerReplyData.message.refusal,
+                annotations: reviewerReplyData.message.annotations,
+              },
+              index: reviewerReplyData.index,
+              logprobs: reviewerReplyData.logprobs,
+              finish_reason: reviewerReplyData.finish_reason,
+            };
+
+            // Check if reviewer reply already exists
+            const existingReviewerReply = await ReviewerReply.findOne({
+              reviewId: reviewerReplyData.reviewId,
+            });
+
+            let savedReviewerReply;
+            if (existingReviewerReply) {
+              // Update existing reviewer reply
+              savedReviewerReply = await ReviewerReply.findOneAndUpdate(
+                { reviewId: reviewerReplyData.reviewId },
+                transformedReviewerReply,
+                { new: true, runValidators: true }
+              );
+            } else {
+              // Create new reviewer reply
+              savedReviewerReply = await ReviewerReply.create(transformedReviewerReply);
+            }
+
+            if (savedReviewerReply) {
+              processedReviewerReplies.push(savedReviewerReply);
+            }
+          } catch (reviewerReplyError) {
+            errors.push({
+              reviewId: reviewerReplyData.reviewId,
+              error:
+                reviewerReplyError instanceof Error
+                  ? reviewerReplyError.message
+                  : 'Unknown error processing reviewer reply',
+            });
+          }
+         }
+        }
+
+        // Add processed data to overall arrays
+        allProcessedReviews.push(...processedReviews);
+        allProcessedReviewerReplies.push(...processedReviewerReplies);
+        allErrors.push(...errors);
+      }
+
       return {
         success: true,
-        processedCount: processedReviews.length,
-        errorCount: errors.length,
-        processedReviews: processedReviews.map((review) => ({
+        processedCount: allProcessedReviews.length,
+        processedReviewerRepliesCount: allProcessedReviewerReplies.length,
+        errorCount: allErrors.length,
+        processedReviews: allProcessedReviews.map((review) => ({
           reviewId: review?.reviewId,
           starRating: review?.starRating,
           businessProfileName: review?.businessProfileName,
         })),
-        errors: errors.length > 0 ? errors : undefined,
+        processedReviewerReplies: allProcessedReviewerReplies.map((reply) => ({
+          reviewId: reply?.reviewId,
+          starRating: reply?.starRating,
+          businessProfileId: reply?.businessProfileId,
+        })),
+        errors: allErrors.length > 0 ? allErrors : undefined,
       };
     } catch (error) {
       throw new AppError(
