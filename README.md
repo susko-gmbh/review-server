@@ -1,8 +1,8 @@
-# Shop-Sphere Auth Hub
+# Review Sync Backend
 
 ### Description
 
-The **Shop-Sphere Auth Hub** is a Node.js-based authentication backend built to handle multi-shop user authentication and session management. It provides user registration, login, secure token handling, and shop association features. Built using **Express.js**, **TypeScript**, and **MongoDB**, it's ideal for scalable SaaS platforms managing shop-specific user access.
+The **Review Sync Backend** is a Node.js-based backend service built to handle review data synchronization and management. It provides webhook endpoints for receiving review data, manages business profiles, reviews, and reviewer replies. Built using **Express.js**, **TypeScript**, and **MongoDB**, it's designed for scalable review management systems that need to sync data from external platforms.
 
 ---
 
@@ -21,13 +21,13 @@ Make sure the following are installed:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/sabbirsami/shop-sphere-auth-hub
+   git clone https://github.com/sabbirsami/review-sync-backend
    ```
 
 2. **Navigate into the project directory:**
 
    ```bash
-   cd shop-sphere-auth-hub
+   cd review-sync-backend
    ```
 
 3. **Install dependencies:**
@@ -88,36 +88,66 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 ### Features
 
-- Multi-shop user registration
-- JWT-based access and refresh tokens
-- Secure cookies and session handling
-- Shop-specific user profiles
-- Remember Me support with refresh tokens
+- Webhook endpoints for review data synchronization
+- Business profile management
+- Review and reviewer reply management
+- RESTful API for data retrieval
+- MongoDB integration with Mongoose
+- TypeScript support with comprehensive validation
 
 ---
 
 ### Models
 
-#### User Model
+#### Business Profile Model
 
-- `username`: string
-- `password`: hashed string
-- `shops`: array of shop names (min. 3 required)
+- `businessProfileId`: string (unique identifier)
+- `businessProfileName`: string
 - `createdAt`: Date
 - `updatedAt`: Date
+
+#### Review Model
+
+- `reviewId`: string (unique identifier)
+- `businessProfileId`: string
+- `reviewerName`: string
+- `starRating`: number
+- `comment`: string
+- `createTime`: Date
+- `updateTime`: Date
+
+#### Reviewer Reply Model
+
+- `reviewId`: string
+- `businessProfileId`: string
+- `comment`: string
+- `createTime`: Date
+- `updateTime`: Date
 
 ---
 
 ### API Endpoints
 
-#### Auth Routes
+#### Webhook Routes
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Log in a user
-- `GET /api/auth/profile` - Get the profile of the logged-in user
-- `GET /api/auth/shop/:shopName` - Retrieve shop information
-- `POST /api/auth/refresh-token` - Issue a new access token
-- `POST /api/auth/logout` - Log out the user
+- `POST /api/webhook/reviews` - Receive review data from external platforms
+- `GET /api/webhook/status` - Get webhook service status
+
+#### Business Profile Routes
+
+- `GET /api/business-profiles` - Get all business profiles
+- `GET /api/business-profiles/:id` - Get a specific business profile
+
+#### Review Routes
+
+- `GET /api/reviews` - Get reviews with filtering and pagination
+- `GET /api/reviews/:id` - Get a specific review
+
+#### Reviewer Reply Routes
+
+- `GET /api/reviewer-replies` - Get reviewer replies with filtering and pagination
+- `GET /api/reviewer-replies/:reviewId` - Get replies for a specific review
+- `DELETE /api/reviewer-replies/:reviewId` - Delete a reviewer reply
 
 ---
 
@@ -127,78 +157,75 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 #### Example Requests
 
-**Register a User**
+**Send Review Data via Webhook**
 
 ```json
-POST /api/auth/register
+POST /api/webhook/reviews
 {
-  "username": "alice_wonder",
-  "password": "alice123@",
-  "shops": ["bookstore", "coffeehouse", "artgallery"]
+  "businessProfileId": "4190239679011070000",
+  "businessProfileName": "Example Business",
+  "executionTimestamp": "2024-01-15T10:30:00Z",
+  "reviews": [
+    {
+      "reviewId": "review123",
+      "reviewerName": "John Doe",
+      "starRating": 5,
+      "comment": "Great service!",
+      "createTime": "2024-01-15T09:00:00Z"
+    }
+  ],
+  "reviewReplies": [
+    {
+      "reviewId": "review123",
+      "comment": "Thank you for your feedback!",
+      "createTime": "2024-01-15T10:00:00Z"
+    }
+  ]
 }
 ```
 
-**Login**
-
-```json
-POST /api/auth/login
-{
-  "username": "alice_wonder",
-  "password": "alice123@",
-  "rememberMe": true
-}
-```
-
-**Profile Access**
+**Get Reviews**
 
 ```http
-GET /api/auth/profile
-Authorization: Bearer <accessToken>
+GET /api/reviews?businessProfileId=4190239679011070000&limit=10&page=1
 ```
 
-**Shop Info**
+**Get Reviewer Replies**
 
 ```http
-GET /api/auth/shop/bookstore
-Authorization: Bearer <accessToken>
+GET /api/reviewer-replies?businessProfileId=4190239679011070000&limit=5
 ```
 
-**Refresh Token**
+**Get Specific Review**
 
 ```http
-POST /api/auth/refresh-token
-```
-
-**Logout**
-
-```http
-POST /api/auth/logout
+GET /api/reviews/review123
 ```
 
 ---
 
 ### Postman Test Scripts
 
-**Login — Save Token**
+**Webhook — Validate Response**
 
 ```javascript
-pm.test('Login successful', function () {
+pm.test('Webhook data processed successfully', function () {
   pm.response.to.have.status(200);
   var jsonData = pm.response.json();
-  if (jsonData.success) {
-    pm.environment.set('accessToken', jsonData.data.accessToken);
-  }
+  pm.expect(jsonData.success).to.be.true;
+  pm.expect(jsonData.data.processedReviews).to.be.a('number');
 });
 ```
 
-**Registration — Validate Response**
+**Reviews — Validate Pagination**
 
 ```javascript
-pm.test('Registration successful', function () {
-  pm.response.to.have.status(201);
+pm.test('Reviews retrieved with pagination', function () {
+  pm.response.to.have.status(200);
   var jsonData = pm.response.json();
   pm.expect(jsonData.success).to.be.true;
-  pm.expect(jsonData.data.shops.length).to.be.at.least(3);
+  pm.expect(jsonData.data.reviews).to.be.an('array');
+  pm.expect(jsonData.data.pagination).to.have.property('total');
 });
 ```
 
@@ -209,12 +236,12 @@ pm.test('Registration successful', function () {
 ```json
 {
   "success": true,
-  "message": "User created successfully",
-  "statusCode": 201,
+  "message": "Review data processed successfully",
+  "statusCode": 200,
   "data": {
-    "_id": "676abc123def456789012345",
-    "username": "alice_wonder",
-    "shops": ["bookstore", "coffeehouse", "artgallery"]
+    "processedReviews": 5,
+    "processedReviewerReplies": 3,
+    "businessProfileId": "4190239679011070000"
   }
 }
 ```
@@ -225,9 +252,10 @@ pm.test('Registration successful', function () {
 
 - Type-safe TypeScript architecture
 - Centralized error handling
-- JWT + Secure cookie-based sessions
+- MongoDB with Mongoose ODM
 - ESLint + Prettier for clean code
-- Zod input validation (optional)
+- Zod input validation for request data
+- Modular architecture with separate services
 
 ---
 
@@ -244,4 +272,4 @@ Deploy using platforms like Render, Railway, or your own VPS.
 
 ### License
 
-MIT License — [shop-sphere-auth-hub](https://github.com/sabbirsami/shop-sphere-auth-hub)
+MIT License — [review-sync-backend](https://github.com/sabbirsami/review-sync-backend)
