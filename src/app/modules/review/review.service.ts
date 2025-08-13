@@ -457,20 +457,17 @@ class ReviewServiceClass {
     try {
       const { businessProfileId } = filters;
 
-      // Build match query
+      // Build match query for ReviewerReply collection
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const matchQuery: Record<string, any> = {
-        reviewReply: { $exists: true, $ne: null },
-      };
+      const matchQuery: Record<string, any> = {};
 
       // Add business profile filter if provided
       if (businessProfileId) {
-        matchQuery.$or = [
-          { businessProfileId: businessProfileId },
-          { businessProfileName: businessProfileId },
-          { businessProfileId: Number(businessProfileId) },
-        ];
+        matchQuery.businessProfileId = businessProfileId;
       }
+
+      // Import ReviewerReply model
+      const { ReviewerReply } = await import('../reviewer-reply/reviewer-reply.model');
 
       // Aggregation pipeline to find the last reply date and count replies for that date
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -483,7 +480,7 @@ class ReviewServiceClass {
                 format: '%Y-%m-%d',
                 date: {
                   $dateFromString: {
-                    dateString: '$reviewReply.updateTime'
+                    dateString: '$createTime'
                   }
                 }
               }
@@ -494,7 +491,7 @@ class ReviewServiceClass {
           $group: {
             _id: '$replyDate',
             count: { $sum: 1 },
-            lastReplyTime: { $max: '$reviewReply.updateTime' }
+            lastReplyTime: { $max: '$createTime' }
           }
         },
         {
@@ -505,7 +502,7 @@ class ReviewServiceClass {
         }
       ];
 
-      const result = await Review.aggregate(pipeline);
+      const result = await ReviewerReply.aggregate(pipeline);
 
       if (result.length === 0) {
         return {
