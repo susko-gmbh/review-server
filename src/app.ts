@@ -54,6 +54,15 @@ const corsConfig = {
       'http://*.review-sync-three.vercel.app',
       'https://*.review-sync-three.vercel.app/',
       'http://*.review-sync-three.vercel.app/',
+      'https://*.localhost:5173',
+      'http://*.localhost:5173',
+      'https://*.localhost:3000',
+      'http://*.localhost:3000',
+      'https://reviews.susko.ai/',
+      'http://reviews.susko.ai/',
+      'https://*.reviews.susko.ai/',
+      'http://*.reviews.susko.ai/',
+      'http://*.susko.ai/',
     ];
 
     // Check for exact matches
